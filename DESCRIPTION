@@ -6,7 +6,10 @@ Date: 2023-09-29
 Author: Who wrote it
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: GPL
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+RoxygenNote: 7.2.3
+Encoding: UTF-8
+Imports: ggplot2,plyr,methods

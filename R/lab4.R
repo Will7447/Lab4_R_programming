@@ -1,11 +1,17 @@
 #' A linear regression function
 #' @description
-#' A RC function that can handle linear regression problems like function lm()
+#' A RC class function that can handle linear regression problems like function lm()
 #' @field beta_hat: Regressions coefficients 
+#' @field X independent variables
+#' @field y dependent variable
 #' 
-
-
-
+#' 
+#' @importFrom methods new
+#' @importFrom plyr is.formula
+#' @import ggplot2
+#' 
+#' @export linreg
+#' @exportClass linreg
 
 linreg <- setRefClass('linreg',
                       fields = list(beta_hat='matrix',
@@ -82,12 +88,13 @@ linreg <- setRefClass('linreg',
                           return(vec_coef)
                         },
                         summary = function(){
-                          coe_mat = cbind(beta_hat,sqrt(diag(var_beta_hat)),t_beta,p_value)
-                          colnames(coe_mat) <- c('Estimate','Std. Error','t value','Pr(>|t|)')
+                          last_col <- matrix(rep("***", ncol(X)), ncol = 1)
+                          coe_mat = cbind(beta_hat,sqrt(diag(var_beta_hat)),t_beta,p_value,last_col)
+                          coe_mat <- as.data.frame(coe_mat)
+                          colnames(coe_mat) <- c('Estimate','Std. Error','t value','Pr(>|t|)','')
                           cat('Coefficients:\n')
                           base::print(coe_mat)
-                          cat(paste0('\nResidual standard error: ',sqrt(sigma_hat_2),' on ',d_f,' degrees of freedom'))
+                          cat(paste0('\nResidual standard error: ',round(sqrt(sigma_hat_2),3),' on ',d_f,' degrees of freedom'))
                         }
                                      )
                       )
-
