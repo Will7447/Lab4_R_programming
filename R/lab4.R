@@ -70,7 +70,7 @@ linreg <- setRefClass('linreg',
                             geom_text(aes(label = label), hjust = 1.5, vjust = 0) +
                             theme_test()+
                             labs(x = paste0("Fitted values\nlinreg(",deparse(for_mula),')'), y = expression(sqrt(abs("Standardized residuals")))) +
-                            ggtitle("Scale−Location") +
+                            ggtitle("Scale-Location") +
                             theme(plot.title = element_text(hjust = 0.5))+
                             stat_summary(geom = "line", color = "red", fun = median)
                           p1
@@ -98,3 +98,4 @@ linreg <- setRefClass('linreg',
                         }
                                      )
                       )
+

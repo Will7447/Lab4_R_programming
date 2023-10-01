@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2023-09-29
 Author: Who wrote it
 Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Description: This is a package that contains a RC class function that can handle linear regression models. It can implement an RC class to handle special functions such as print(), plot(), resid(), pred(), coef() and summary().
 License: GPL
 LazyData: true
 NeedsCompilation: no
