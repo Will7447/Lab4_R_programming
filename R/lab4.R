@@ -1,6 +1,9 @@
 #' A linear regression function
 #' @description
-#' A RC class function that can handle linear regression problems like function lm()
+#' A RC class function that can handle linear regression problems like function lm(), it also handles
+#' the special functions print(), plot(), pred(), resid(), coef() and summary(). After loading the
+#' package you can create an object using the lm() function on a data set. Then use the object as argument
+#' in any of the supported special functions such as plot() or print().
 #' @field beta_hat: Regressions coefficients 
 #' @field X independent variables
 #' @field y dependent variable
