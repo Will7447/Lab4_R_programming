@@ -6,16 +6,37 @@
 \alias{linreg}
 \title{A linear regression function}
 \description{
-A RC class function that can handle linear regression problems like function lm()
+A RC class function that can handle linear regression problems like function lm(), it also handles
+the special functions print(), plot(), pred(), resid(), coef() and summary().
 }
 \section{Fields}{
 
 \describe{
-\item{\code{beta_hat:}}{Regressions coefficients}
+\item{\code{beta_hat}}{Regressions coefficients}
 
 \item{\code{X}}{independent variables}
 
 \item{\code{y}}{dependent variable}
+
+\item{\code{y_hat}}{itted values}
+
+\item{\code{e_hat}}{residuals}
+
+\item{\code{d_f}}{degrees of freedom}
+
+\item{\code{sigma_hat_2}}{residual variance}
+
+\item{\code{var_beta_hat}}{variance of the regression coefficients}
+
+\item{\code{t_beta}}{t-values for each coefficient}
+
+\item{\code{p_value}}{p_values for each coefficient}
+
+\item{\code{for_mula}}{formula to linear regression}
+
+\item{\code{data}}{data frame to analyse}
+
+\item{\code{df_name}}{name of the analysed data frame}
 }}
 
 

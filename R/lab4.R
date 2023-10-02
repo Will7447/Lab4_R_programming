@@ -1,13 +1,20 @@
 #' A linear regression function
 #' @description
 #' A RC class function that can handle linear regression problems like function lm(), it also handles
-#' the special functions print(), plot(), pred(), resid(), coef() and summary(). After loading the
-#' package you can create an object using the lm() function on a data set. Then use the object as argument
-#' in any of the supported special functions such as plot() or print().
-#' @field beta_hat: Regressions coefficients 
+#' the special functions print(), plot(), pred(), resid(), coef() and summary(). 
+#' @field beta_hat Regressions coefficients 
 #' @field X independent variables
 #' @field y dependent variable
-#' 
+#' @field y_hat itted values
+#' @field e_hat residuals
+#' @field d_f degrees of freedom
+#' @field sigma_hat_2 residual variance
+#' @field var_beta_hat variance of the regression coefficients
+#' @field t_beta t-values for each coefficient
+#' @field p_value p_values for each coefficient
+#' @field for_mula formula to linear regression
+#' @field data data frame to analyse
+#' @field df_name name of the analysed data frame
 #' 
 #' @importFrom methods new
 #' @importFrom plyr is.formula

@@ -1,9 +1,9 @@
 Package: lab4package
 Type: Package
-Title: Linear regression package using RC classes
-Version: 1.0
+Title: A package to handle linear regression models 
+Version: 0.1.0
 Date: 2023-09-29
-Author@R: c(
+Author: c(
     person("Lepeng", "Zhang", email = "lepzh903@student.liu.se", role = "cre"),
     person("William", "Wijgård", email = "wilwi220@student.liu.se", role = "aut"))
 Maintainer: William Wijgård <wilwi220@student.liu.se>
