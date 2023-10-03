@@ -1,0 +1,69 @@
+---
+title: "Guide for lab4package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Guide for lab4package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Description
+This package offers a RC class function that can analyze linear regression models like what *lm()* can do.
+
+## Import
+```{r setup}
+library(lab4package)
+```
+
+## Instantiation
+The first argument is a formula and the second argument is a data frame. Here takes *iris* for demonstration.
+```{r}
+data(iris)
+linreg_mod <- linreg$new(Petal.Length~Species, data=iris)
+```
+
+## Methods
+Below are the methods that this package offers.
+
+### print()
+This will print out the function call and the coefficients of the independent variables.
+```{r}
+linreg_mod$print()
+```
+### plot()
+This will print out two plots helping analyze the outcomes.
+```{r}
+linreg_mod$plot()
+```
+
+### resid()
+This will generate the residuals of the observations, which are the differences between the actual values and the predicted values.
+```{r}
+linreg_mod$resid()
+```
+### pred()
+This can print out the predicted values.
+```{r}
+linreg_mod$pred()
+```
+### coef()
+This will print out the coefficients of the independent variables. 
+```{r}
+linreg_mod$coef()
+```
+### summary()
+This will give a summary of the linear regression model.
+```{r}
+linreg_mod$summary()
+```
+
+
+
+

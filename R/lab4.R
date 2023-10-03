@@ -83,8 +83,8 @@ linreg <- setRefClass('linreg',
                             ggtitle("Scale-Location") +
                             theme(plot.title = element_text(hjust = 0.5))+
                             stat_summary(geom = "line", color = "red", fun = median)
-                          p1
-                          p2
+                          base::print(p1)
+                          base::print(p2)
                         },
                         resid = function(){
                           return(e_hat)
