@@ -175,3 +175,50 @@ ridgereg <- setRefClass('ridgereg',
 )
 
 
+#' Mean Delay of Flights for Different Airports
+#' @description
+#' This function creates a plot that visualizes the mean delay of flights for different airports by longitude and latitude.
+#' 
+#' @import nycflights13
+#' @import dplyr
+#' @import ggplot2
+#' 
+#' @examples
+#' visualize_airport_delays()
+#' @export visualize_airport_delays
+#' @name visualize_airport_delays
+
+visualize_airport_delays <-  function(){
+  flightdata <- nycflights13::flights
+  airportsdata <- nycflights13::airports
+  lat <- airportsdata$lat
+  lon <- airportsdata$lon
+  dep_delay <- flightdata$dep_delay
+  arr_delay <- flightdata$arr_delay
+  
+  dep_delay_df <- flightdata %>%
+    dplyr::inner_join(airportsdata, by=c("origin"="faa")) %>%
+    dplyr::group_by(lat, lon) %>%
+    dplyr::summarise(dep_delay_mean = mean(dep_delay, na.rm = TRUE), .groups = 'drop')
+  
+  arr_delay_df <- flightdata %>%
+    dplyr::inner_join(airportsdata, by=c("dest"="faa")) %>%
+    dplyr::group_by(lat, lon) %>%
+    dplyr::summarise(arr_delay_mean = mean(arr_delay, na.rm = TRUE), .groups = 'drop')
+  
+  delays_data <- dplyr::full_join(dep_delay_df, arr_delay_df, by = c("lon", "lat"))
+  mean_delay_time <- rowMeans(delays_data[, c("dep_delay_mean", "arr_delay_mean")], na.rm = TRUE)
+  
+  ggplot2::ggplot(delays_data, aes(x = lon, y = lat, size = mean_delay_time, color = mean_delay_time)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_size_continuous(name = "mean delay time (min)") +
+    ggplot2::scale_color_continuous(name = "mean delay time (min)",low = "black", high = "green") +
+    ggplot2::labs(title = "Mean Delay Time of Flights for Different Airports",
+                  x = "Longitude",
+                  y = "Latitude") +
+    ggplot2::theme_minimal()
+}
+
+
+
+
