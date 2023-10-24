@@ -1,24 +1,33 @@
-#' A linear regression function
+#' @title A linear regression function
 #' @description
 #' A RC class function that can handle linear regression problems like function lm(), it also handles
 #' the special functions print(), plot(), pred(), resid(), coef() and summary(). 
 #' @field beta_hat Regressions coefficients 
 #' @field X independent variables
 #' @field y dependent variable
-#' @field y_hat itted values
+#' @field y_hat fitted values
 #' @field e_hat residuals
 #' @field d_f degrees of freedom
 #' @field sigma_hat_2 residual variance
 #' @field var_beta_hat variance of the regression coefficients
 #' @field t_beta t-values for each coefficient
 #' @field p_value p_values for each coefficient
-#' @field for_mula formula to linear regression
+#' @field formula formula to linear regression
 #' @field data data frame to analyse
 #' @field df_name name of the analysed data frame
+#' 
+#' 
+#' @param formula a formula
+#' @param data a data frame
+#' 
+#' @examples
+#' linreg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
+#' 
 #' 
 #' @importFrom methods new
 #' @importFrom plyr is.formula
 #' @import ggplot2
+#' 
 #' 
 #' @export linreg
 #' @exportClass linreg
@@ -34,21 +43,21 @@ linreg <- setRefClass('linreg',
                                     var_beta_hat='matrix',
                                     t_beta='matrix',
                                     p_value='matrix',
-                                    for_mula='formula',
+                                    formula='formula',
                                     data='data.frame',
                                     df_name='character'),
                       methods = list(
-                        initialize = function(for_mula,data){
-                          stopifnot(plyr::is.formula(for_mula),is.data.frame(data))
-                          for_mula <<- for_mula
+                        initialize = function(formula,data){
+                          stopifnot(plyr::is.formula(formula),is.data.frame(data))
+                          formula <<- formula
                           data <<- data
                           df_name <<- deparse(substitute(data))
-                          X <<- model.matrix(for_mula,data)
-                          y <<- data[,all.vars(for_mula)[1]]
+                          X <<- model.matrix(formula,data)
+                          y <<- data[,all.vars(formula)[1]]
                           beta_hat <<- solve(t(X)%*%X)%*%t(X)%*%y
                           y_hat <<- X%*%beta_hat
                           e_hat <<- y-y_hat
-                          d_f <<- length(y)-length(all.vars(for_mula))
+                          d_f <<- length(y)-length(all.vars(formula))
                           sigma_hat_2 <<- (t(e_hat)%*%e_hat)[1,1]/d_f
                           var_beta_hat <<- sigma_hat_2*solve(t(X)%*%X)
                           t_beta <<- beta_hat/sqrt(diag(var_beta_hat))
@@ -56,7 +65,7 @@ linreg <- setRefClass('linreg',
                           },
                         print = function(){
                           cat('Call:\n')
-                          cat(paste0('linreg(formula = ',deparse(for_mula),', data = ',df_name,')\n'))
+                          cat(paste0('linreg(formula = ',deparse(formula),', data = ',df_name,')\n'))
                           cat('\nCoefficients:\n')
                           base::print(beta_hat[,1])
                         },
@@ -69,7 +78,7 @@ linreg <- setRefClass('linreg',
                             geom_point(size = 3.5, shape = 1, stroke = 1) +
                             geom_text(aes(label = label), hjust = 1.5, vjust = 0) +
                             theme_test()+
-                            labs(x = paste0("Fitted values\nlinreg(",deparse(for_mula),')'), y = "Residuals") +
+                            labs(x = paste0("Fitted values\nlinreg(",deparse(formula),')'), y = "Residuals") +
                             ggtitle("Residuals vs Fitted") +
                             theme(plot.title = element_text(hjust = 0.5))+
                             geom_hline(yintercept = 0, color = "grey", linetype = "dotted")+
@@ -79,7 +88,7 @@ linreg <- setRefClass('linreg',
                             geom_point(size = 3.5, shape = 1, stroke = 1) +
                             geom_text(aes(label = label), hjust = 1.5, vjust = 0) +
                             theme_test()+
-                            labs(x = paste0("Fitted values\nlinreg(",deparse(for_mula),')'), y = expression(sqrt(abs("Standardized residuals")))) +
+                            labs(x = paste0("Fitted values\nlinreg(",deparse(formula),')'), y = expression(sqrt(abs("Standardized residuals")))) +
                             ggtitle("Scale-Location") +
                             theme(plot.title = element_text(hjust = 0.5))+
                             stat_summary(geom = "line", color = "red", fun = median)
@@ -108,4 +117,61 @@ linreg <- setRefClass('linreg',
                         }
                                      )
                       )
+
+
+ridgereg <- setRefClass('ridgereg',
+                      fields = list(beta_hat_ridge='matrix',
+                                    X='matrix',
+                                    X_norm='matrix',
+                                    y='numeric',
+                                    y_hat='matrix',
+                                    formula='formula',
+                                    data='data.frame',
+                                    df_name='character',
+                                    lambda='numeric'
+                                    ),
+                      methods = list(
+                        initialize = function(formula,data,lambda){
+                          stopifnot(plyr::is.formula(formula),is.data.frame(data),is.numeric(lambda))
+                        
+                          formula <<- formula
+                          data <<- data
+                          lambda <<- lambda
+                          df_name <<- deparse(substitute(data))
+                          X <<- model.matrix(formula,data)
+                          y <<- data[,all.vars(formula)[1]]
+                          X_norm <<- cbind(X[,1],scale(X[,-1]))
+                          beta_hat_ridge <<- solve(t(X_norm)%*%X_norm+lambda*diag(ncol(X_norm)), t(X_norm)%*%y)
+                          rownames(beta_hat_ridge)[1] <<- '(Intercept)'
+                          y_hat <<- X_norm%*%beta_hat_ridge
+                        },
+                        
+                        print = function(){
+                          cat('Call:\n')
+                          cat(paste0('ridgereg(formula = ',deparse(formula),', data = ',df_name,')\n'))
+                          cat('\nCoefficients:\n')
+                          base::print(beta_hat_ridge[,1])
+                        },
+                        
+                        predict = function(newdata = NULL){
+                          if (is.null(newdata)){
+                            return(y_hat)
+                          }else{
+                            means <- colMeans(X[,-1])
+                            sds <- apply(X[,-1], 2, sd)
+                            newdata_norm <- scale(newdata,means,sds)
+                            predictors <- as.matrix(cbind(1,newdata_norm))
+                            predictions <- predictors %*% beta_hat_ridge
+                            return(predictions)
+                          }
+                        },
+                      
+                        coef = function(){
+                          vec_coef = as.vector(beta_hat_ridge)
+                          names(vec_coef) = row.names(beta_hat_ridge)
+                          return(vec_coef)
+                        }
+                      )
+)
+
 
