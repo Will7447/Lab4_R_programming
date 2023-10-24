@@ -1,0 +1,40 @@
+---
+title: "How to do a prediction problem using ridgereg() function"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to do a prediction problem using ridgereg() function}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Step 1: Set up training and test datasets.
+The *chas* variable in dataset **BostonHousing** is a factor variable and has to be converted to a numeric variable at first. 
+```{r}
+library(mlbench) 
+data(BostonHousing)
+BostonHousing$chas <- as.numeric(as.character(BostonHousing$chas))
+```
+The proportion of training dataset to original dataset is 70%.
+```{r}
+library(caret)
+set.seed(42)
+index <- createDataPartition(BostonHousing$medv, 
+                             p = 0.7, 
+                             list = FALSE, 
+                             times = 1)
+training_set <- BostonHousing[index, ]
+test_set <- BostonHousing[-index, ]
+```
+
+
+## Step 2: Fit a linear regression model without forward selection of covariates.
+```{r}
+linreg_no_forward <- lm(medv~.,data = training_set)
+```

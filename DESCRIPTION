@@ -19,5 +19,13 @@ Suggests:
 Config/testthat/edition: 3
 RoxygenNote: 7.2.3
 Encoding: UTF-8
-Imports: ggplot2,plyr,methods
+Imports: ggplot2,
+          plyr,
+          methods,
+          dplyr,
+          nycflights13,
+          MASS,
+          caret,
+          leaps,
+          mlbench
 VignetteBuilder: knitr

@@ -119,6 +119,33 @@ linreg <- setRefClass('linreg',
                       )
 
 
+#' @title A ridge regression function 
+#' @description
+#' A RC class function that can handle ridge regression problems similar as lm.ridge(), it also handles
+#' the special functions print(), predict(), and coef(). 
+#' @field beta_hat_ridge Regressions coefficients 
+#' @field X independent variables
+#' @field X_norm normalization X
+#' @field y dependent variable
+#' @field y_hat fitted values
+#' @field formula formula to ridge regression
+#' @field data data frame to analyse
+#' @field df_name name of the analysed data frame
+#' @field lambda value to tune ridge regression models
+#' 
+#' @param formula a formula
+#' @param data a data frame
+#' @param lambda a numeric
+#' 
+#' @importFrom methods new
+#' @importFrom plyr is.formula
+#' @importFrom MASS lm.ridge 
+#' @import caret
+#' @import leaps
+#' @import mlbench
+#' 
+#' @export ridgereg
+#' @exportClass ridgereg
 ridgereg <- setRefClass('ridgereg',
                       fields = list(beta_hat_ridge='matrix',
                                     X='matrix',

@@ -5,6 +5,11 @@
 \alias{linreg-class}
 \alias{linreg}
 \title{A linear regression function}
+\arguments{
+\item{formula}{a formula}
+
+\item{data}{a data frame}
+}
 \description{
 A RC class function that can handle linear regression problems like function lm(), it also handles
 the special functions print(), plot(), pred(), resid(), coef() and summary().
@@ -18,7 +23,7 @@ the special functions print(), plot(), pred(), resid(), coef() and summary().
 
 \item{\code{y}}{dependent variable}
 
-\item{\code{y_hat}}{itted values}
+\item{\code{y_hat}}{fitted values}
 
 \item{\code{e_hat}}{residuals}
 
@@ -32,7 +37,7 @@ the special functions print(), plot(), pred(), resid(), coef() and summary().
 
 \item{\code{p_value}}{p_values for each coefficient}
 
-\item{\code{for_mula}}{formula to linear regression}
+\item{\code{formula}}{formula to linear regression}
 
 \item{\code{data}}{data frame to analyse}
 
@@ -40,3 +45,8 @@ the special functions print(), plot(), pred(), resid(), coef() and summary().
 }}
 
 
+\examples{
+linreg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
+
+
+}
