@@ -113,5 +113,47 @@ ridge_models_set <- train(medv ~ .,
 ridge_models_set
 ```
 
+## Step 6: Evaluate the performance of all three models on the test dataset.
+Firstly, extract the actual values in test dataset named as *actual_test_values* and compute predicted values by three models, named as *predicted_linreg_no_forward*, *predicted_linreg_with_forward*, and *predicted_ridgereg_no_forward*.
+```{r}
+actual_test_values <- test_set$medv
+
+predicted_linreg_no_forward <- predict(linreg_no_forward, test_set)
+predicted_linreg_with_forward <- predict(linreg_with_forward, test_set)
+
+ridgereg_no_forward <- ridgereg$new(medv ~ ., training_set, lambda = 1.995262)
+predicted_ridgereg_no_forward <- ridgereg_no_forward$predict(test_set[,-14])
+
+# combine three predicted values as a data frame for metrics calculation.
+predict_value_df <- cbind(predicted_linreg_no_forward,predicted_linreg_with_forward,predicted_ridgereg_no_forward) 
+```
+
+Then, compute **MSE**, **RMSE**, **R-squared** for each of the models.
+```{r}
+mse_values <- c()
+rmse_values <- c()
+rsquared_values <- c()
+for (i in 1:length(predict_value_df[1,])){
+  mse_values[i] <- mean((predict_value_df[,i]-actual_test_values)^2)
+  rmse_values[i] <- sqrt(mse_values[i])
+  ss_total <- sum((actual_test_values-mean(actual_test_values))^2)
+  ss_residual <- sum((actual_test_values-predict_value_df[,i])^2)
+  rsquared_values[i] <- 1-(ss_residual/ss_total)
+}
+```
+
+Finally, create a data frame for comparison.
+```{r}
+comparison_df <- cbind(mse_values,rmse_values,rsquared_values)
+three_model_names <- c("linreg_no_forward", "linreg_with_forward", "ridgereg_no_forward")
+row.names(comparison_df) <- three_model_names
+print(comparison_df)
+```
+Two facts can be concluded by the *comparison_df*. **First**, forward selection of covariates can improve performance in the context of the same type of regression model (linear regression in this case). **Second**, in the absence of forward selection for both, ridge regression model can do a better fit job compared with the linear one.  
+
+As for the linear regression model with forward selection and the ridge regression model without forward selection, a conclusion cannot be drawn yet because there are two variables involved.
+
+
+
 
 
