@@ -38,3 +38,80 @@ test_set <- BostonHousing[-index, ]
 ```{r}
 linreg_no_forward <- lm(medv~.,data = training_set)
 ```
+
+
+## Step 3: Fit a linear regression model with forward selection of covariates.
+The package *leaps* is for forward selection of covariates. The best model is chosen based on the adjusted $R^2$.
+```{r}
+library(leaps)
+forward_selection <- regsubsets(medv~., 
+                                data = training_set,
+                                nvmax = length(training_set),
+                                method = "forward",
+                                intercept = TRUE)
+model_sets <- summary(forward_selection)
+best_model_index <- which.max(model_sets$adjr2)
+selected_predictors <- names(which(model_sets$which[best_model_index,]))
+linreg_with_forward <- lm(medv~., data = training_set[, c(selected_predictors[-1], "medv")])
+```
+
+## Step 4: Evaluate the performance of *linreg_with_forward* model on the training dataset.
+```{r}
+predicted_values <- predict(linreg_with_forward)
+actual_values <- training_set$medv
+
+mse <- mean((predicted_values - actual_values)^2)
+rmse <- sqrt(mse)
+
+ss_total <- sum((actual_values - mean(actual_values))^2)
+ss_residual <- sum((actual_values - predicted_values)^2)
+rsquared <- 1 - (ss_residual / ss_total)
+
+metrics <- c("MSE"=mse,"RMSE"=rmse,"R-squared"=rsquared)
+print(metrics)
+```
+## Step 5: Fit a ridge regression model using *ridgereg()* function.
+Firstly, create a list called *ridge_model_list* serving as a method in *train* function. In this list, custom *ridgereg()* function from package **lab4package**.
+```{r}
+library(lab4package)
+ridge_model_list <- list(label = "Custom Ridge Regression",
+                       library = "lab4package",
+                       type = "Regression",
+                       parameters = data.frame(parameter = "lambda",
+                                               class = "numeric",
+                                               label = "Lambda"),
+                       grid = function (x, y, len = NULL, search = "grid"){
+                         if (search == "grid") {
+                           out <- expand.grid(lambda = c(0, 10^seq(-1, -4, length = len - 1)))
+                         }
+                         else {
+                           out <- data.frame(lambda = 10^runif(len, min = -5, 1))
+                         }
+                         out
+                       },
+                       fit = function (x, y, wts, param, lev, last, classProbs, ...){
+                         lab4package::ridgereg$new(y~x, as.data.frame(cbind(x,y)), lambda = param$lambda)
+                       },
+                       predict = function (modelFit, newdata, submodels = NULL) {
+                         modelFit$predict(newdata)
+                       },
+                       prob = NULL,
+                       sort = function(x){
+                         x[order(-x$lambda), ]
+                       }
+) 
+```
+
+Then, fit ridge regression models to the training dataset for different values of λ (set by argument *tuneGrid*). Also, find the best hyperparameter value for λ using 10-fold cross-validation on the training set (set by argument *trControl*).
+```{r}
+set.seed(42)
+ridge_models_set <- train(medv ~ .,
+                  data = training_set,
+                  method = ridge_model_list,
+                  tuneGrid = expand.grid(lambda = c(0,10^seq(-4, 2, by = 0.1))),
+                  trControl = trainControl(method = "cv", number = 10))
+ridge_models_set
+```
+
+
+
