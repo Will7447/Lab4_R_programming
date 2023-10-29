@@ -33,3 +33,72 @@ flights_data <- select(sampled_flights_data, -c(year,month,day,dep_time,sched_de
 weather_data <- select(weather, -c(year,month,day,hour))
 ```
 
+## Step 3: Add extra weather data
+Heavy rainfall and bad visibility weather conditions may have an impact on flight takeoffs. Thus, a variable named *precip_visib* created which equals $precip/visib$.
+```{r}
+weather_data <- mutate(weather_data,precip_visib = precip/visib)
+```
+
+## Step 4: Divide the flight dataset into training, test and validation sets
+Firstly, combine the **weather** dataset to **flights** dataset based on *origin* and *time_hour*.
+```{r}
+merged_data <- flights_data %>% left_join(weather_data, by = c("origin", "time_hour"))
+```
+
+Secondly, delete *origin* and *time_hour*.
+```{r}
+flight_weather_data <- select(merged_data,-c("origin", "time_hour"))
+flight_weather_data <- na.omit(flight_weather_data)
+flight_weather_data <- as.data.frame(flight_weather_data)
+```
+
+Then, divide the dataset into three sets.
+```{r}
+library(caret)
+set.seed(42)
+training_idx <- createDataPartition(flight_weather_data$dep_delay, 
+                                    p = 0.8, 
+                                    list = FALSE)
+trainingset <- flight_weather_data[training_idx,]
+test_valid_data <- flight_weather_data[-training_idx,]
+set.seed(42)
+test_idx <- createDataPartition(test_valid_data$dep_delay, 
+                                    p = 0.25, 
+                                    list = FALSE)
+testset <- test_valid_data[test_idx,]
+validset <- test_valid_data[-test_idx,]
+```
+
+## Step 5: Find the best $\lambda$
+```{r}
+library(lab4package)
+
+lambda_RMSE_list <- list(lambda = numeric(0),RMSE = numeric(0))
+lambda_range <- c(0,10^seq(-3, 4, by = 0.1))
+valid_actual_value <- validset$dep_delay
+i <- 1
+
+for (m in lambda_range){
+  flight_delays_model <- ridgereg$new(dep_delay~.,trainingset,m)
+  valid_predict_value <- flight_delays_model$predict(validset[,-1])
+  valid_RMSE <- sqrt(mean((valid_actual_value-valid_predict_value)^2))
+  
+  lambda_RMSE_list$lambda[i] <- m
+  lambda_RMSE_list$RMSE[i] <- valid_RMSE
+  i = i+1
+}
+lambda_RMSE_df <- data.frame(lambda_RMSE_list)
+optimal_lambda <- lambda_RMSE_df$lambda[which.min(lambda_RMSE_df$RMSE)]
+print(optimal_lambda)
+```
+## Step 6:  Predict the test set
+```{r}
+test_actual_value <- testset$dep_delay
+
+flight_delays_model <- ridgereg$new(dep_delay~.,trainingset,optimal_lambda)
+test_predict_value <- flight_delays_model$predict(testset[,-1])
+test_RMSE <- sqrt(mean((test_actual_value-test_predict_value)^2))
+print(test_RMSE)
+```
+
+
