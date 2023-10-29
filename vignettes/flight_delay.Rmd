@@ -1,0 +1,35 @@
+---
+title: "Predict the delay of each flight using ridgereg()"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Predict the delay of each flight using ridgereg()}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Step 1: Scale down the dataset
+Scale down the **flights** dataset to half.
+```{r}
+library(nycflights13)
+library(dplyr)
+
+set.seed(42)
+sampled_flights_data <- slice_sample(flights, prop = 0.5)
+```
+
+## Step 2: Remove irrelative variables
+In **flights** dataset, *dep_delay* is the dependent variable. *origin* and *time_hour* are for combining with **weather** dataset. The rest variables are useless.  
+In **weather** dataset, *origin* and *time_hour* are for combining with **flights** dataset. All variables related to weather are regarded as having a predictive value. *year*, *month*, *day*, and *hour* are useless because *time_hour* is enough.
+```{r}
+flights_data <- select(sampled_flights_data, -c(year,month,day,dep_time,sched_dep_time,arr_time,sched_arr_time,arr_delay,carrier,flight,tailnum,dest,air_time,distance,hour,minute)) 
+
+weather_data <- select(weather, -c(year,month,day,hour))
+```
+

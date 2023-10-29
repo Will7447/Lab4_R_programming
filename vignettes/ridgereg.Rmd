@@ -149,9 +149,10 @@ three_model_names <- c("linreg_no_forward", "linreg_with_forward", "ridgereg_no_
 row.names(comparison_df) <- three_model_names
 print(comparison_df)
 ```
-Two facts can be concluded by the *comparison_df*. **First**, forward selection of covariates can improve performance in the context of the same type of regression model (linear regression in this case). **Second**, in the absence of forward selection for both, ridge regression model can do a better fit job compared with the linear one.  
-
-As for the linear regression model with forward selection and the ridge regression model without forward selection, a conclusion cannot be drawn yet because there are two variables involved.
+Two facts can be concluded by the comparison data frame.  
+First, forward selection of covariates can improve performance (with less $MSE$ and $RMSE$ as well as larger $R^2$) in the context of the same type of regression model (linear regression in this case).  
+Second, in the absence of forward selection for both, ridge regression model can do a better fit job compared with the linear one.  
+As for the linear regression model **with** forward selection and the ridge regression model **without** forward selection, a conclusion cannot be drawn yet because there are two variables involved. Further studies are needed.
 
 
 
