@@ -6,7 +6,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -15,7 +14,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Step 1: Scale down the dataset
-Scale down the **flights** dataset to half.
+Scale down the **flights** dataset to its half.
 ```{r}
 library(nycflights13)
 library(dplyr)
@@ -25,12 +24,11 @@ sampled_flights_data <- slice_sample(flights, prop = 0.5)
 ```
 
 ## Step 2: Remove irrelative variables
-In **flights** dataset, *dep_delay* is the dependent variable. *origin* and *time_hour* are for combining with **weather** dataset. The rest variables are useless.  
-In **weather** dataset, *origin* and *time_hour* are for combining with **flights** dataset. All variables related to weather are regarded as having a predictive value. *year*, *month*, *day*, and *hour* are useless because *time_hour* is enough.
+In **flights** dataset, *dep_delay* is the dependent variable. *origin* and *time_hour* are for combining with **weather** dataset. The rest variables are irrelative.  
+In **weather** dataset, *origin* and *time_hour* are for combining with **flights** dataset. *year*, *month*, *day*, and *hour* are useless because *time_hour* is enough. Also, we reckon *wind_dir*, *wind_speed*, and *pressure* are irrelative.
 ```{r}
 flights_data <- select(sampled_flights_data, -c(year,month,day,dep_time,sched_dep_time,arr_time,sched_arr_time,arr_delay,carrier,flight,tailnum,dest,air_time,distance,hour,minute)) 
-
-weather_data <- select(weather, -c(year,month,day,hour))
+weather_data <- select(weather, -c(year,month,day,hour,wind_dir,wind_speed,pressure))
 ```
 
 ## Step 3: Add extra weather data
@@ -87,11 +85,13 @@ for (m in lambda_range){
   lambda_RMSE_list$RMSE[i] <- valid_RMSE
   i = i+1
 }
+
 lambda_RMSE_df <- data.frame(lambda_RMSE_list)
 optimal_lambda <- lambda_RMSE_df$lambda[which.min(lambda_RMSE_df$RMSE)]
+plot(lambda_RMSE_df$lambda, lambda_RMSE_df$RMSE, log = "x", type = "o")
 print(optimal_lambda)
 ```
-## Step 6:  Predict the test set
+## Step 6: Predict the test set
 ```{r}
 test_actual_value <- testset$dep_delay
 
@@ -100,5 +100,3 @@ test_predict_value <- flight_delays_model$predict(testset[,-1])
 test_RMSE <- sqrt(mean((test_actual_value-test_predict_value)^2))
 print(test_RMSE)
 ```
-
-
